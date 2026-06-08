@@ -7,7 +7,7 @@ COPY frontend ./frontend
 RUN mvn clean package -DskipTests -q
 
 # Stage 2 — Run
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 # Railway injects PORT at runtime; default to 8080 locally
