@@ -1,0 +1,8 @@
+# Ignore local build artifacts and node_modules
+target/
+**/node_modules/
+.git/
+.mvn/
+*.jar
+.vscode/
+frontend/dist/
