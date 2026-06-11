@@ -7,6 +7,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,7 +16,8 @@ import java.util.Map;
 @Slf4j
 public class GlobalExceptionHandler {
 
-    public record ErrorResponse(String code, String message) {}
+    public record ErrorResponse(String code, String message) {
+    }
 
     @ExceptionHandler(AccountNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleAccountNotFound(AccountNotFoundException ex) {
@@ -57,6 +59,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
 
+    // ── Handles missing static resources (e.g. /react/, /favicon.ico) ──
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoResourceFound(NoResourceFoundException ex) {
+        log.debug("Static resource not found: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse("NOT_FOUND", "Resource not found."));
+    }
+
+    // ── Fallback for everything else ──
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleFallback(Exception ex) {
         log.error("Unhandled exception occurred", ex);
